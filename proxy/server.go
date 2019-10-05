@@ -18,9 +18,14 @@ const (
 	refreshQueueSize  = 2048
 )
 
-// Server is a caching dns proxy that upgrades DNS to DNS over TLS.
+type cacher interface {
+	get(q *dns.Msg) (a *dns.Msg, ok bool)
+	put(q *dns.Msg, a *dns.Msg)
+}
+
+// Server is a caching DNS proxy that upgrades DNS to DNS over TLS.
 type Server struct {
-	cache *cache
+	cache cacher
 	pools []*pool
 	rq    chan *dns.Msg
 	dial  func(addr string, cfg *tls.Config) (net.Conn, error)
